@@ -1,27 +1,34 @@
 {
+  "name": "echo-ai-construction",
   "version": 2,
+  "public": true,
   "builds": [
     {
-      "src": "**/*.html",
+      "src": "frontend/**",
       "use": "@vercel/static"
-    },
-    {
-      "src": "api/**/*.py",
-      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/\Echo/Altus"
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/\Echo/Altus"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/",
+      "dest": "/frontend/index-modern.html"
     }
   ],
-  "env": {
-    "SUPABASE_URL": "@supabase-url",
-    "SUPABASE_ANON_KEY": "@supabase-anon-key"
-  }
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/frontend/index-modern.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
+    }
+  ]
 }

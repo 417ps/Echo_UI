@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Construction Docs Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+
+        header {
+            background-color: #1a73e8;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1a73e8;
+        }
+
+        .voice-btn {
+            width: 48px;
+            height: 48px;
+            border: none;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        .voice-btn:hover {
+            background-color: #e8eaed;
+        }
+
+        .voice-btn.recording {
+            background-color: #ea4335;
+            color: white;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            margin-bottom: 15px;
+        }
+
+        .quick-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag-btn {
+            padding: 8px 16px;
+            border: 1px solid #dadce0;
+            background: white;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-btn:hover {
+            background-color: #f8f9fa;
+        }
+
+        .tag-btn.active {
+            background-color: #1a73e8;
+            color: white;
+            border-color: #1a73e8;
+        }
+
+        .results-container {
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #1a73e8;
+            font-size: 16px;
+        }
+
+        .result-page {
+            background-color: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        .result-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .result-tag {
+            background-color: #e8f0fe;
+            color: #1967d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .result-summary {
+            color: #5f6368;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #5f6368;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #5f6368;
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .search-btn:hover {
+            background-color: #1557b0;
+        }
+
+        /* Modal for full page view */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 900px;
+            margin: 20px auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #5f6368;
+        }
+
+        .page-content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .search-container {
+                padding: 15px;
+            }
+            
+            .tag-btn {
+                font-size: 13px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🔧 Construction Docs Search</h1>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <div class="search-input-group">
+                <input type="text" id="searchInput" placeholder="Search manuals..." autocomplete="off">
+                <button class="voice-btn" id="voiceBtn" title="Voice search">
+                    🎤
+                </button>
+            </div>
+
+            <select id="systemFilter">
+                <option value="">All Systems</option>
+                <option value="HVAC">HVAC</option>
+                <option value="Electrical">Electrical</option>
+                <option value="Plumbing">Plumbing</option>
+                <option value="Fire-Safety">Fire Safety</option>
+                <option value="Structural">Structural</option>
+                <option value="General">General</option>
+            </select>
+
+            <div class="quick-tags">
+                <button class="tag-btn" data-tag="diagram">📊 Diagrams</button>
+                <button class="tag-btn" data-tag="specifications">📋 Specs</button>
+                <button class="tag-btn" data-tag="installation">🔨 Installation</button>
+                <button class="tag-btn" data-tag="troubleshooting">🔍 Troubleshooting</button>
+                <button class="tag-btn" data-tag="parts-list">📦 Parts</button>
+                <button class="tag-btn" data-tag="maintenance">🔧 Maintenance</button>
+            </div>
+
+            <button class="search-btn" onclick="performSearch()">Search</button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <!-- Results will be populated here -->
+        </div>
+    </div>
+
+    <!-- Modal for viewing full page content -->
+    <div class="modal" id="pageModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Page Content</h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="page-content" id="pageContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // API configuration
+        const API_URL = 'http://localhost:8000';
+        
+        // State
+        let selectedTags = [];
+        let isRecording = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tag button handlers
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tag = e.target.dataset.tag;
+                    if (selectedTags.includes(tag)) {
+                        selectedTags = selectedTags.filter(t => t !== tag);
+                        e.target.classList.remove('active');
+                    } else {
+                        selectedTags.push(tag);
+                        e.target.classList.add('active');
+                    }
+                });
+            });
+
+            // Enter key handler
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            // Voice search handler
+            document.getElementById('voiceBtn').addEventListener('click', toggleVoiceSearch);
+        });
+
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const system = document.getElementById('systemFilter').value;
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            if (!query && selectedTags.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">Please enter a search query or select tags</div>';
+                return;
+            }
+
+            // Show loading
+            resultsContainer.innerHTML = '<div class="loading">Searching...</div>';
+
+            try {
+                let results = [];
+
+                if (selectedTags.length > 0) {
+                    // Search by tags
+                    const params = new URLSearchParams();
+                    selectedTags.forEach(tag => params.append('tags', tag));
+                    if (system) params.append('system', system);
+
+                    const response = await fetch(`${API_URL}/search/tags?${params}`);
+                    const data = await response.json();
+                    results = data.results;
+                } else {
+                    // Text search
+                    const params = new URLSearchParams({
+                        q: query,
+                        limit: 20
+                    });
+                    if (system) params.append('system', system);
+
+                    const response = await fetch(`${API_URL}/search/text?${params}`);
+                    const data = await response.json();
+                    results = data.results;
+                }
+
+                displayResults(results);
+            } catch (error) {
+                console.error('Search error:', error);
+                resultsContainer.innerHTML = '<div class="no-results">Error performing search. Please try again.</div>';
+            }
+        }
+
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('resultsContainer');
+
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-results">No results found. Try different search terms or tags.</div>';
+                return;
+            }
+
+            const html = results.map(result => `
+                <div class="result-card" onclick="viewPage('${result.id}')">
+                    <div class="result-header">
+                        <div class="result-title">${result.system} - ${result.document_name}</div>
+                        <div class="result-page">Page ${result.page_number}</div>
+                    </div>
+                    <div class="result-tags">
+                        ${result.tags.map(tag => `<span class="result-tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="result-summary">${result.summary}</div>
+                </div>
+            `).join('');
+
+            resultsContainer.innerHTML = html;
+        }
+
+        async function viewPage(pageId) {
+            try {
+                const response = await fetch(`${API_URL}/page/${pageId}`);
+                const page = await response.json();
+
+                document.getElementById('modalTitle').textContent = 
+                    `${page.document_name} - Page ${page.page_number}`;
+                document.getElementById('pageContent').textContent = page.content;
+                document.getElementById('pageModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading page:', error);
+                alert('Error loading page content');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('pageModal').style.display = 'none';
+        }
+
+        // Voice search functionality
+        function toggleVoiceSearch() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert('Voice search is not supported in your browser');
+                return;
+            }
+
+            const voiceBtn = document.getElementById('voiceBtn');
+            
+            if (!isRecording) {
+                startVoiceRecognition();
+                voiceBtn.classList.add('recording');
+                isRecording = true;
+            } else {
+                stopVoiceRecognition();
+                voiceBtn.classList.remove('recording');
+                isRecording = false;
+            }
+        }
+
+        let recognition;
+        function startVoiceRecognition() {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('searchInput').value = transcript;
+                stopVoiceRecognition();
+                performSearch();
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Voice recognition error:', event.error);
+                stopVoiceRecognition();
+            };
+
+            recognition.start();
+        }
+
+        function stopVoiceRecognition() {
+            if (recognition) {
+                recognition.stop();
+            }
+            document.getElementById('voiceBtn').classList.remove('recording');
+            isRecording = false;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            const modal = document.getElementById('pageModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
