@@ -1,34 +1,11 @@
 {
-  "name": "echo-ai-construction",
-  "version": 2,
-  "public": true,
-  "builds": [
-    {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/",
-      "dest": "/frontend/index-modern.html"
-    }
-  ],
+  "buildCommand": "",
+  "outputDirectory": "frontend",
+  "framework": null,
   "rewrites": [
     {
       "source": "/",
-      "destination": "/frontend/index-modern.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "destination": "/index-modern.html"
     }
   ]
 }
