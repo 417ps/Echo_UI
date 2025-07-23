@@ -447,8 +447,203 @@ function hideTypingIndicator() {
     }
 }
 
+// Particle system for login page
+function initParticleSystem() {
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let particles = [];
+    let animationId;
+    
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    
+    function createParticle() {
+        return {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            size: Math.random() * 2 + 1,
+            opacity: Math.random() * 0.5 + 0.2,
+            color: `hsl(${200 + Math.random() * 60}, 70%, 70%)`
+        };
+    }
+    
+    function initParticles() {
+        particles = [];
+        for (let i = 0; i < 50; i++) {
+            particles.push(createParticle());
+        }
+    }
+    
+    function updateParticles() {
+        particles.forEach(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            
+            if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+            
+            particle.x = Math.max(0, Math.min(canvas.width, particle.x));
+            particle.y = Math.max(0, Math.min(canvas.height, particle.y));
+        });
+    }
+    
+    function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(particle => {
+            ctx.save();
+            ctx.globalAlpha = particle.opacity;
+            ctx.fillStyle = particle.color;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+        
+        // Draw connections
+        particles.forEach((p1, i) => {
+            particles.slice(i + 1).forEach(p2 => {
+                const dx = p1.x - p2.x;
+                const dy = p1.y - p2.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < 100) {
+                    ctx.save();
+                    ctx.globalAlpha = (1 - distance / 100) * 0.1;
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        });
+    }
+    
+    function animate() {
+        updateParticles();
+        drawParticles();
+        animationId = requestAnimationFrame(animate);
+    }
+    
+    function startParticles() {
+        if (document.getElementById('login-page').classList.contains('active') || 
+            document.getElementById('register-page').classList.contains('active')) {
+            canvas.style.display = 'block';
+            resizeCanvas();
+            initParticles();
+            animate();
+        } else {
+            canvas.style.display = 'none';
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        }
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    
+    // Watch for page changes
+    const observer = new MutationObserver(() => {
+        startParticles();
+    });
+    
+    observer.observe(document.getElementById('main-content'), {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['class']
+    });
+    
+    startParticles();
+}
+
+// Magnetic cursor functionality
+function initMagneticCursor() {
+    const cursor = document.querySelector('.magnetic-cursor');
+    const magneticElements = document.querySelectorAll('.btn, .dashboard-card, .nav-menu a, .form-group input, .form-group select');
+    
+    let mouseX = 0, mouseY = 0;
+    let cursorX = 0, cursorY = 0;
+    
+    // Update mouse position
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+    
+    // Smooth cursor animation
+    function animateCursor() {
+        cursorX += (mouseX - cursorX) * 0.1;
+        cursorY += (mouseY - cursorY) * 0.1;
+        
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+        
+        requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+    
+    // Magnetic effect for elements
+    magneticElements.forEach(element => {
+        element.addEventListener('mouseenter', () => {
+            cursor.classList.add('hovering');
+        });
+        
+        element.addEventListener('mouseleave', () => {
+            cursor.classList.remove('hovering');
+        });
+        
+        element.addEventListener('mousedown', () => {
+            cursor.classList.add('clicking');
+        });
+        
+        element.addEventListener('mouseup', () => {
+            cursor.classList.remove('clicking');
+        });
+    });
+    
+    // Add magnetic pull effect
+    document.addEventListener('mousemove', (e) => {
+        magneticElements.forEach(element => {
+            const rect = element.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            const deltaX = e.clientX - centerX;
+            const deltaY = e.clientY - centerY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            const magneticRange = 100;
+            const magneticStrength = 0.1;
+            
+            if (distance < magneticRange && element.classList.contains('dashboard-card')) {
+                const force = (magneticRange - distance) / magneticRange;
+                const moveX = deltaX * force * magneticStrength;
+                const moveY = deltaY * force * magneticStrength;
+                
+                element.style.transform = `translate(${moveX}px, ${moveY}px) translateY(-5px)`;
+            } else if (!element.matches(':hover') && element.classList.contains('dashboard-card')) {
+                element.style.transform = '';
+            }
+        });
+    });
+}
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize particle system
+    initParticleSystem();
+    
+    // Initialize magnetic cursor
+    initMagneticCursor();
+    
     // Check if user is already logged in
     if (authToken) {
         // For demo token, skip verification
