@@ -11,6 +11,7 @@ let currentUser = null;
 // Chat State
 let conversationHistory = [];
 let currentConversationId = null;
+let conversationSummaries = new Map();
 
 // DOM Elements
 let chatMessages, chatInput, sendBtn;
@@ -21,7 +22,27 @@ document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     setupEventListeners();
     initializeTheme();
+    setupNavigation();
 });
+
+function setupNavigation() {
+    // Add click handlers to all nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            const onclick = item.getAttribute('onclick');
+            if (onclick) {
+                // Extract page name from onclick attribute
+                const match = onclick.match(/showPage\('(.+?)'\)/);
+                if (match) {
+                    showPage(match[1]);
+                }
+            }
+        });
+    });
+    
+    console.log('Navigation setup complete');
+}
 
 function initializeElements() {
     chatMessages = document.getElementById('chat-messages');
@@ -124,8 +145,13 @@ function logout() {
 // Page Navigation
 function showPage(pageName) {
     console.log('Showing page:', pageName);
+    
+    // Check if pages exist
+    const allPages = document.querySelectorAll('.page');
+    console.log('Total pages found:', allPages.length);
+    
     // Hide all pages
-    document.querySelectorAll('.page').forEach(page => {
+    allPages.forEach(page => {
         page.classList.remove('active');
     });
     
@@ -134,8 +160,19 @@ function showPage(pageName) {
     if (page) {
         page.classList.add('active');
         console.log('Page found and activated:', pageName);
+        
+        // Ensure the page is visible
+        page.style.display = 'flex';
+        page.style.flexDirection = 'column';
     } else {
-        console.error('Page not found:', pageName);
+        console.error('Page not found:', `${pageName}-page`);
+        // Try to show chat as fallback
+        const chatPage = document.getElementById('chat-page');
+        if (chatPage) {
+            chatPage.classList.add('active');
+            chatPage.style.display = 'flex';
+            chatPage.style.flexDirection = 'column';
+        }
     }
     
     // Update active nav item
@@ -155,6 +192,15 @@ function showPage(pageName) {
 
 // Make showPage function globally available
 window.showPage = showPage;
+
+// Initialize knowledge graph when showing that page
+const originalShowPage = showPage;
+window.showPage = function(pageName) {
+    originalShowPage(pageName);
+    if (pageName === 'knowledge-graph' && window.initializeKnowledgeGraph) {
+        setTimeout(() => window.initializeKnowledgeGraph(), 100);
+    }
+};
 
 // Also make other functions globally available
 window.toggleTheme = toggleTheme;
@@ -247,6 +293,11 @@ async function sendMessageToWebhook(message) {
             }
             
             addMessageToChat(assistantMessage, 'assistant');
+            
+            // Generate summary if conversation is long enough
+            if (conversationHistory.length >= 5 && conversationHistory.length % 5 === 0) {
+                generateConversationSummary();
+            }
         } else {
             addMessageToChat('Sorry, I encountered an error. Please try again.', 'assistant');
         }
@@ -715,4 +766,165 @@ function viewComplianceDetails(category) {
 
 function updateComplianceStatus(category) {
     showNotification('Compliance status updated', 'success');
+}
+
+// Conversation Summary Functions
+function generateConversationSummary() {
+    const summaryId = `summary-${Date.now()}`;
+    const recentMessages = conversationHistory.slice(-5);
+    
+    // Analyze conversation for key topics and confidence
+    const analysis = analyzeConversation(recentMessages);
+    
+    // Create summary with confidence indicators
+    const summary = {
+        id: summaryId,
+        timestamp: new Date().toISOString(),
+        messageCount: recentMessages.length,
+        topics: analysis.topics,
+        averageConfidence: analysis.confidence,
+        keyPoints: analysis.keyPoints,
+        uncertainties: analysis.uncertainties
+    };
+    
+    conversationSummaries.set(summaryId, summary);
+    displayConversationSummary(summary);
+}
+
+function analyzeConversation(messages) {
+    // Simulate topic extraction and confidence analysis
+    const topics = [];
+    const keyPoints = [];
+    const uncertainties = [];
+    let totalConfidence = 0;
+    let confidenceCount = 0;
+    
+    messages.forEach(msg => {
+        // Look for confidence indicators in messages
+        const confidenceMatch = msg.content.match(/(\d+)%\s*confidence/i);
+        if (confidenceMatch) {
+            const confidence = parseInt(confidenceMatch[1]);
+            totalConfidence += confidence;
+            confidenceCount++;
+            
+            if (confidence < 50) {
+                uncertainties.push({
+                    text: msg.content.substring(0, 100) + '...',
+                    confidence: confidence
+                });
+            }
+        }
+        
+        // Extract key topics (simplified)
+        if (msg.content.includes('data center')) topics.push('Data Center Infrastructure');
+        if (msg.content.includes('compliance')) topics.push('Regulatory Compliance');
+        if (msg.content.includes('budget')) topics.push('Budget Management');
+        if (msg.content.includes('safety')) topics.push('Safety Protocols');
+        
+        // Extract key points from assistant messages
+        if (msg.role === 'assistant' && msg.content.length > 50) {
+            const firstSentence = msg.content.split('.')[0];
+            if (firstSentence) {
+                keyPoints.push(firstSentence.trim());
+            }
+        }
+    });
+    
+    const avgConfidence = confidenceCount > 0 ? totalConfidence / confidenceCount : 75;
+    
+    return {
+        topics: [...new Set(topics)], // Remove duplicates
+        confidence: avgConfidence,
+        keyPoints: keyPoints.slice(0, 3), // Top 3 key points
+        uncertainties: uncertainties
+    };
+}
+
+function displayConversationSummary(summary) {
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'chat-message system-summary';
+    summaryDiv.innerHTML = `
+        <div class="summary-container">
+            <div class="summary-header">
+                <h4>📊 Conversation Summary</h4>
+                <span class="summary-confidence ${getConfidenceClass(summary.averageConfidence)}">
+                    ${Math.round(summary.averageConfidence)}% Average Confidence
+                </span>
+            </div>
+            
+            <div class="summary-content">
+                ${summary.topics.length > 0 ? `
+                    <div class="summary-section">
+                        <h5>Topics Discussed:</h5>
+                        <div class="topic-tags">
+                            ${summary.topics.map(topic => `<span class="topic-tag">${topic}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${summary.keyPoints.length > 0 ? `
+                    <div class="summary-section">
+                        <h5>Key Points:</h5>
+                        <ul class="key-points">
+                            ${summary.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                ${summary.uncertainties.length > 0 ? `
+                    <div class="summary-section uncertainty-section">
+                        <h5>⚠️ Low Confidence Items:</h5>
+                        <div class="uncertainty-list">
+                            ${summary.uncertainties.map(item => `
+                                <div class="uncertainty-item">
+                                    <span class="confidence-badge low">${item.confidence}%</span>
+                                    <span>${item.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+            
+            <div class="summary-footer">
+                <button class="summary-action" onclick="linkToKnowledgeGraph('${summary.id}')">
+                    🔗 View in Knowledge Graph
+                </button>
+                <span class="summary-timestamp">${new Date(summary.timestamp).toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+    
+    // Insert summary into chat
+    if (chatMessages) {
+        chatMessages.appendChild(summaryDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+}
+
+function getConfidenceClass(confidence) {
+    if (confidence >= 80) return 'high-confidence';
+    if (confidence >= 50) return 'medium-confidence';
+    return 'low-confidence';
+}
+
+function linkToKnowledgeGraph(summaryId) {
+    const summary = conversationSummaries.get(summaryId);
+    if (summary) {
+        // Store summary data for knowledge graph
+        localStorage.setItem('pendingSummary', JSON.stringify(summary));
+        
+        // Navigate to knowledge graph
+        showPage('knowledge-graph');
+        
+        // Show notification
+        showNotification('Summary linked to knowledge graph', 'success');
+        
+        // Update knowledge graph with summary data
+        setTimeout(() => {
+            if (window.updateGraphWithSummary) {
+                window.updateGraphWithSummary(summary);
+            }
+        }, 500);
+    }
 }

@@ -59,6 +59,17 @@
                         </svg>
                         Risk Analysis
                     </a>
+                    <a href="#" class="nav-item" onclick="showPage('knowledge-graph')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <circle cx="8" cy="3" r="1.5" fill="currentColor"/>
+                            <circle cx="3" cy="8" r="1.5" fill="currentColor"/>
+                            <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
+                            <circle cx="5" cy="13" r="1.5" fill="currentColor"/>
+                            <circle cx="11" cy="13" r="1.5" fill="currentColor"/>
+                            <path d="M8 3L3 8M8 3l5 5M3 8l2 5M13 8l-2 5M5 13h6" stroke="currentColor" fill="none" stroke-width="1" stroke-linecap="round"/>
+                        </svg>
+                        Knowledge Graph
+                    </a>
                 </div>
                 
                 <div class="nav-section">
@@ -556,6 +567,235 @@
                 </div>
             </div>
 
+            <!-- Knowledge Graph Page -->
+            <div id="knowledge-graph-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Knowledge Graph & Trust System</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="refreshGraph()" title="Refresh Graph">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M4 10a6 6 0 0111.41-2.59l1.42-1.42A8 8 0 104 10h0z" stroke="currentColor" fill="none" stroke-width="1.5"/>
+                                <path d="M16 4v6h-6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="toggleGraphView()" title="Toggle View">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <rect x="2" y="2" width="5" height="5" rx="1"/>
+                                <rect x="9" y="2" width="5" height="5" rx="1"/>
+                                <rect x="2" y="9" width="5" height="5" rx="1"/>
+                                <rect x="9" y="9" width="5" height="5" rx="1"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="knowledge-graph-container">
+                        <!-- Trust Score Overview -->
+                        <div class="trust-overview">
+                            <h2>System Trust Score</h2>
+                            <div class="trust-score-display">
+                                <div class="trust-meter">
+                                    <svg width="200" height="200" viewBox="0 0 200 200">
+                                        <defs>
+                                            <linearGradient id="trust-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:#ff4444;stop-opacity:1" />
+                                                <stop offset="50%" style="stop-color:#ffaa00;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="100" cy="100" r="90" fill="none" stroke="#e0e0e0" stroke-width="20"/>
+                                        <circle cx="100" cy="100" r="90" fill="none" stroke="url(#trust-gradient)" stroke-width="20"
+                                                stroke-dasharray="565" stroke-dashoffset="113" transform="rotate(-90 100 100)"
+                                                stroke-linecap="round"/>
+                                    </svg>
+                                    <div class="trust-score-value">85%</div>
+                                    <div class="trust-score-label">High Confidence</div>
+                                </div>
+                                <div class="trust-indicators">
+                                    <div class="indicator high">
+                                        <span class="indicator-label">Verified Data</span>
+                                        <span class="indicator-value">92%</span>
+                                    </div>
+                                    <div class="indicator medium">
+                                        <span class="indicator-label">Cross-Referenced</span>
+                                        <span class="indicator-value">78%</span>
+                                    </div>
+                                    <div class="indicator high">
+                                        <span class="indicator-label">Recent Updates</span>
+                                        <span class="indicator-value">95%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Graph Controls -->
+                        <div class="graph-controls">
+                            <div class="control-group">
+                                <label>Filter by Confidence</label>
+                                <div class="confidence-filter">
+                                    <button class="filter-btn active" data-confidence="all">All</button>
+                                    <button class="filter-btn" data-confidence="high">High (>80%)</button>
+                                    <button class="filter-btn" data-confidence="medium">Medium (50-80%)</button>
+                                    <button class="filter-btn" data-confidence="low">Low (<50%)</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>View Mode</label>
+                                <div class="view-toggle">
+                                    <button class="view-btn active" onclick="setGraphView('network')">Network</button>
+                                    <button class="view-btn" onclick="setGraphView('hierarchy')">Hierarchy</button>
+                                    <button class="view-btn" onclick="setGraphView('ranking')">Ranking</button>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label>Search Nodes</label>
+                                <input type="text" id="node-search" placeholder="Search knowledge nodes..." onkeyup="searchNodes(this.value)">
+                            </div>
+                        </div>
+
+                        <!-- Main Graph Visualization -->
+                        <div class="graph-visualization">
+                            <div id="knowledge-graph-canvas"></div>
+                            <div class="graph-legend">
+                                <h4>Legend</h4>
+                                <div class="legend-item">
+                                    <span class="legend-dot high"></span>
+                                    <span>High Confidence (>80%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot medium"></span>
+                                    <span>Medium Confidence (50-80%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot low"></span>
+                                    <span>Low Confidence (<50%)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-dot uncertain"></span>
+                                    <span>Uncertain (AI flagged)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Critical Variables Ranking -->
+                        <div class="variables-ranking">
+                            <h2>Critical Variables Ranking</h2>
+                            <div class="ranking-list">
+                                <div class="ranking-item" data-importance="critical">
+                                    <div class="rank-number">1</div>
+                                    <div class="variable-info">
+                                        <h4>Data Center Capacity</h4>
+                                        <p>Referenced in 47 documents • 98% confidence</p>
+                                        <div class="impact-bar">
+                                            <div class="impact-fill" style="width: 95%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="variable-score">95</div>
+                                </div>
+                                <div class="ranking-item" data-importance="high">
+                                    <div class="rank-number">2</div>
+                                    <div class="variable-info">
+                                        <h4>Regulatory Compliance Status</h4>
+                                        <p>Referenced in 38 documents • 92% confidence</p>
+                                        <div class="impact-bar">
+                                            <div class="impact-fill" style="width: 88%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="variable-score">88</div>
+                                </div>
+                                <div class="ranking-item" data-importance="high">
+                                    <div class="rank-number">3</div>
+                                    <div class="variable-info">
+                                        <h4>Project Timeline</h4>
+                                        <p>Referenced in 35 documents • 85% confidence</p>
+                                        <div class="impact-bar">
+                                            <div class="impact-fill" style="width: 82%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="variable-score">82</div>
+                                </div>
+                                <div class="ranking-item" data-importance="medium">
+                                    <div class="rank-number">4</div>
+                                    <div class="variable-info">
+                                        <h4>Budget Allocation</h4>
+                                        <p>Referenced in 29 documents • 78% confidence</p>
+                                        <div class="impact-bar">
+                                            <div class="impact-fill warning" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="variable-score">75</div>
+                                </div>
+                                <div class="ranking-item" data-importance="low">
+                                    <div class="rank-number">5</div>
+                                    <div class="variable-info">
+                                        <h4>Subcontractor Performance</h4>
+                                        <p>Referenced in 18 documents • 45% confidence</p>
+                                        <div class="impact-bar">
+                                            <div class="impact-fill low" style="width: 45%"></div>
+                                        </div>
+                                        <span class="uncertainty-flag">⚠️ Low confidence - needs verification</span>
+                                    </div>
+                                    <div class="variable-score">45</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Node Details Panel -->
+                        <div id="node-details" class="node-details-panel" style="display: none;">
+                            <div class="panel-header">
+                                <h3 id="node-title">Node Details</h3>
+                                <button class="close-btn" onclick="closeNodeDetails()">×</button>
+                            </div>
+                            <div class="panel-content">
+                                <div class="confidence-display">
+                                    <label>Confidence Level</label>
+                                    <div class="confidence-bar">
+                                        <div id="confidence-fill" class="confidence-fill"></div>
+                                        <span id="confidence-value">0%</span>
+                                    </div>
+                                </div>
+                                <div class="node-metadata">
+                                    <div class="metadata-item">
+                                        <label>Sources</label>
+                                        <span id="node-sources">0</span>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <label>Last Updated</label>
+                                        <span id="node-updated">Never</span>
+                                    </div>
+                                    <div class="metadata-item">
+                                        <label>Connections</label>
+                                        <span id="node-connections">0</span>
+                                    </div>
+                                </div>
+                                <div class="uncertainty-notice" id="uncertainty-notice" style="display: none;">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 2l6 11H2L8 2zm0 4v3m0 2h.01"/>
+                                    </svg>
+                                    <p>This information has low confidence. The AI system is uncertain about its accuracy.</p>
+                                </div>
+                                <div class="node-description">
+                                    <label>Description</label>
+                                    <p id="node-description">No description available</p>
+                                </div>
+                                <div class="related-nodes">
+                                    <label>Related Nodes</label>
+                                    <div id="related-nodes-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Settings Page -->
             <div id="settings-page" class="page">
                 <header class="chat-header">
@@ -651,5 +891,6 @@
     </div>
 
     <script src="js/modern-app.js"></script>
+    <script src="js/knowledge-graph.js"></script>
 </body>
 </html>
