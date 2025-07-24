@@ -3,199 +3,646 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Echo - Construction Intelligence Platform</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <title>Echo AI - Construction Intelligence Assistant</title>
+    <link rel="stylesheet" href="css/modern-styles.css">
 </head>
 <body>
-    <div class="magnetic-cursor"></div>
     <div id="app">
-        <nav class="navbar">
-            <div class="nav-container">
-                <h1 class="logo">Echo</h1>
-                <ul class="nav-menu">
-                    <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
-                    <li><a href="#" onclick="showPage('documents')">Documents</a></li>
-                    <li><a href="#" onclick="showPage('compliance')">Compliance</a></li>
-                    <li><a href="#" onclick="showPage('risk')">Risk Analysis</a></li>
-                    <li><a href="#" onclick="showPage('chat')">AI Assistant</a></li>
-                    <li><a href="#" onclick="logout()">Logout</a></li>
-                </ul>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 2v6m0 0v6m0-6h6M8 8H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>New Chat</span>
+                </button>
             </div>
-        </nav>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Main</div>
+                    <a href="#" class="nav-item active" onclick="showPage('chat')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M2 4a2 2 0 012-2h8a2 2 0 012 2v5a2 2 0 01-2 2H8l-3 3v-3H4a2 2 0 01-2-2V4z"/>
+                        </svg>
+                        AI Assistant
+                    </a>
+                    <a href="#" class="nav-item" onclick="showPage('dashboard')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <rect x="2" y="2" width="5" height="5" rx="1"/>
+                            <rect x="9" y="2" width="5" height="5" rx="1"/>
+                            <rect x="2" y="9" width="5" height="5" rx="1"/>
+                            <rect x="9" y="9" width="5" height="5" rx="1"/>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a href="#" class="nav-item" onclick="showPage('documents')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M4 2a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2V6.414a1 1 0 00-.293-.707l-2.414-2.414A1 1 0 0010.586 3H4zm6 2v2h2l-2-2z"/>
+                        </svg>
+                        Documents
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Analysis</div>
+                    <a href="#" class="nav-item" onclick="showPage('compliance')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 14A6 6 0 108 2a6 6 0 000 12zm2.5-8.5L7 9 5.5 7.5" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Compliance
+                    </a>
+                    <a href="#" class="nav-item" onclick="showPage('risk')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 2l6 11H2L8 2zm0 4v3m0 2h.01" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Risk Analysis
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-section-title">Account</div>
+                    <a href="#" class="nav-item" onclick="showPage('settings')">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M8 10a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path d="M8 1l1.5 1.5L11 2l.5 2-.5 2 1.5.5v2L11 9l-.5 1.5L8 11l-1.5-1.5L5 10l-.5-2 .5-2L3.5 5.5v-2L5 3l.5-1.5L8 1z" stroke="currentColor" fill="none" stroke-width="1"/>
+                        </svg>
+                        Settings
+                    </a>
+                    <a href="#" class="nav-item" onclick="logout()">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                            <path d="M11 12l4-4-4-4M15 8H6m-3 6V2h7" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            </nav>
+        </aside>
 
-        <main id="main-content">
-            <canvas id="particle-canvas"></canvas>
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Login Page -->
             <div id="login-page" class="page active">
-                <div class="auth-container">
-                    <h2>Login to Altus</h2>
-                    <form id="login-form" onsubmit="login(event)">
-                        <div class="form-group">
-                            <label for="email">Email:</label>
-                            <input type="email" id="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password:</label>
-                            <input type="password" id="password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
-                        <p class="auth-link">
-                            Don't have an account? <a href="#" onclick="showPage('register')">Register</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
-
-            <div id="register-page" class="page">
-                <div class="auth-container">
-                    <h2>Register for Altus</h2>
-                    <form id="register-form" onsubmit="register(event)">
-                        <div class="form-group">
-                            <label for="reg-name">Full Name:</label>
-                            <input type="text" id="reg-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-email">Email:</label>
-                            <input type="email" id="reg-email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-password">Password:</label>
-                            <input type="password" id="reg-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company:</label>
-                            <input type="text" id="company" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Register</button>
-                        <p class="auth-link">
-                            Already have an account? <a href="#" onclick="showPage('login')">Login</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
-
-            <div id="dashboard-page" class="page">
-                <div class="container">
-                    <h2>Dashboard</h2>
-                    <div class="dashboard-grid">
-                        <div class="dashboard-card">
-                            <h3>Active Projects</h3>
-                            <p class="metric">12</p>
-                        </div>
-                        <div class="dashboard-card">
-                            <h3>Compliance Score</h3>
-                            <p class="metric">94%</p>
-                        </div>
-                        <div class="dashboard-card">
-                            <h3>Risk Alerts</h3>
-                            <p class="metric">3</p>
-                        </div>
-                        <div class="dashboard-card">
-                            <h3>Documents Processed</h3>
-                            <p class="metric">247</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="documents-page" class="page">
-                <div class="container">
-                    <h2>Document Analysis</h2>
-                    <div class="upload-section">
-                        <h3>Upload Document</h3>
-                        <form id="upload-form" onsubmit="uploadDocument(event)">
+                <div class="auth-page">
+                    <div class="auth-container">
+                        <h2>Welcome to Echo AI</h2>
+                        <form id="login-form" onsubmit="login(event)">
                             <div class="form-group">
-                                <label for="doc-type">Document Type:</label>
-                                <select id="doc-type">
-                                    <option value="regulation">Regulation</option>
-                                    <option value="specification">Specification</option>
-                                    <option value="permit">Permit</option>
-                                    <option value="contract">Contract</option>
-                                </select>
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
                             </div>
                             <div class="form-group">
-                                <label for="file-upload">Select File:</label>
-                                <input type="file" id="file-upload" accept=".pdf,.doc,.docx" required>
+                                <label for="password">Password</label>
+                                <input type="password" id="password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                            <button type="submit" class="btn">Sign In</button>
+                            <p class="auth-link">
+                                Don't have an account? <a href="#" onclick="showPage('register')">Sign up</a>
+                            </p>
                         </form>
                     </div>
-                    <div id="analysis-results" class="results-section"></div>
                 </div>
             </div>
 
-            <div id="compliance-page" class="page">
-                <div class="container">
-                    <h2>Compliance Management</h2>
-                    <div class="compliance-list">
-                        <div class="compliance-item">
-                            <h4>Building Code Compliance</h4>
-                            <p>Status: <span class="status-badge success">Compliant</span></p>
-                        </div>
-                        <div class="compliance-item">
-                            <h4>Safety Regulations</h4>
-                            <p>Status: <span class="status-badge warning">Review Needed</span></p>
-                        </div>
-                        <div class="compliance-item">
-                            <h4>Environmental Standards</h4>
-                            <p>Status: <span class="status-badge success">Compliant</span></p>
-                        </div>
+            <!-- Register Page -->
+            <div id="register-page" class="page">
+                <div class="auth-page">
+                    <div class="auth-container">
+                        <h2>Create Account</h2>
+                        <form id="register-form" onsubmit="register(event)">
+                            <div class="form-group">
+                                <label for="reg-name">Full Name</label>
+                                <input type="text" id="reg-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-email">Email</label>
+                                <input type="email" id="reg-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-password">Password</label>
+                                <input type="password" id="reg-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="company">Company</label>
+                                <input type="text" id="company" required>
+                            </div>
+                            <button type="submit" class="btn">Create Account</button>
+                            <p class="auth-link">
+                                Already have an account? <a href="#" onclick="showPage('login')">Sign in</a>
+                            </p>
+                        </form>
                     </div>
                 </div>
             </div>
 
-            <div id="risk-page" class="page">
-                <div class="container">
-                    <h2>Risk Analysis</h2>
-                    <div class="risk-grid">
-                        <div class="risk-card">
-                            <h3>Financial Risk</h3>
-                            <p class="risk-level low">Low</p>
-                            <p>Budget variance: 2.3%</p>
-                        </div>
-                        <div class="risk-card">
-                            <h3>Schedule Risk</h3>
-                            <p class="risk-level medium">Medium</p>
-                            <p>Potential delay: 5 days</p>
-                        </div>
-                        <div class="risk-card">
-                            <h3>Safety Risk</h3>
-                            <p class="risk-level low">Low</p>
-                            <p>No incidents in 45 days</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Chat Page -->
             <div id="chat-page" class="page">
-                <div class="container">
-                    <h2>AI Construction Assistant</h2>
-                    <div class="chat-container">
-                        <div class="chat-messages" id="chat-messages">
-                            <div class="chat-message assistant">
-                                <div class="message-content">
-                                    Hello! I'm your AI construction assistant. I can help you with:
-                                    <ul>
-                                        <li>Building codes and regulations</li>
-                                        <li>Project planning and scheduling</li>
-                                        <li>Cost estimation</li>
-                                        <li>Safety compliance</li>
-                                        <li>Technical specifications</li>
-                                    </ul>
-                                    How can I assist you today?
+                <header class="chat-header">
+                    <h1 class="chat-title">Construction AI Assistant</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme" id="theme-toggle">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="exportChat()" title="Export Chat">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 2v10m0 0l-3-3m3 3l3-3M4 18h12" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="clearChat()" title="Clear Chat">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M6 3v1H4v2h12V4h-2V3a1 1 0 00-1-1H7a1 1 0 00-1 1zM5 7v9a2 2 0 002 2h6a2 2 0 002-2V7H5zm3 2v6m4-6v6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Welcome Message -->
+                        <div class="chat-message assistant">
+                            <div class="message-content-wrapper">
+                                <div class="message-avatar">
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10 2a3 3 0 00-3 3v1H5a2 2 0 00-2 2v8a2 2 0 002 2h10a2 2 0 002-2V8a2 2 0 00-2-2h-2V5a3 3 0 00-3-3zm0 8a1.5 1.5 0 110 3 1.5 1.5 0 010-3z"/>
+                                        <circle cx="7" cy="13" r="1"/>
+                                        <circle cx="13" cy="13" r="1"/>
+                                    </svg>
+                                </div>
+                                <div class="message-body">
+                                    <div class="message-content">
+                                        <p>Hello! I'm your AI construction assistant. I can help you with:</p>
+                                        <ul>
+                                            <li>Building codes and regulations</li>
+                                            <li>Project planning and scheduling</li>
+                                            <li>Cost estimation and budgeting</li>
+                                            <li>Safety compliance and protocols</li>
+                                            <li>Technical specifications and standards</li>
+                                            <li>Risk assessment and mitigation</li>
+                                        </ul>
+                                        <p>How can I assist you today?</p>
+                                    </div>
+                                    <div class="message-timestamp">Just now</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="chat-input-container">
+                    </div>
+
+                    <div class="chat-input-container">
+                        <div class="input-wrapper">
                             <form id="chat-form" onsubmit="sendMessage(event)">
-                                <input 
-                                    type="text" 
+                                <textarea 
                                     id="chat-input" 
-                                    placeholder="Type your message here..." 
-                                    autocomplete="off"
-                                    required
-                                >
-                                <button type="submit" class="btn btn-primary">Send</button>
+                                    placeholder="Ask me anything about construction..." 
+                                    rows="1"
+                                    onkeydown="handleKeyDown(event)"
+                                    oninput="autoResize(this)"
+                                ></textarea>
+                                <button type="submit" class="send-btn" id="send-btn">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M8 3l5 5-5 5M3 8h10" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
                             </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Page -->
+            <div id="dashboard-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Dashboard</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M4 10a6 6 0 0111.41-2.59l1.42-1.42A8 8 0 104 10h0z" stroke="currentColor" fill="none" stroke-width="1.5"/>
+                                <path d="M16 4v6h-6" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="dashboard-container">
+                        <div class="dashboard-grid">
+                            <div class="dashboard-card" onclick="showNotification('Loading project details...', 'info')" style="cursor: pointer;">
+                                <div class="card-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                                    </svg>
+                                </div>
+                                <h3>Active Projects</h3>
+                                <p class="metric">12</p>
+                                <p class="metric-change positive">+2 this month</p>
+                            </div>
+                            <div class="dashboard-card" onclick="showPage('compliance')" style="cursor: pointer;">
+                                <div class="card-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </div>
+                                <h3>Compliance Score</h3>
+                                <p class="metric">94%</p>
+                                <p class="metric-change positive">+3% improvement</p>
+                            </div>
+                            <div class="dashboard-card alert" onclick="showPage('risk')" style="cursor: pointer;">
+                                <div class="card-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                                    </svg>
+                                </div>
+                                <h3>Risk Alerts</h3>
+                                <p class="metric">3</p>
+                                <p class="metric-change negative">Requires attention</p>
+                            </div>
+                            <div class="dashboard-card" onclick="showPage('documents')" style="cursor: pointer;">
+                                <div class="card-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                </div>
+                                <h3>Documents Processed</h3>
+                                <p class="metric">247</p>
+                                <p class="metric-change">This quarter</p>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-section">
+                            <h2>Recent Activity</h2>
+                            <div class="activity-list">
+                                <div class="activity-item" onclick="showNotification('Opening Project Phoenix details...', 'info')" style="cursor: pointer;">
+                                    <span class="activity-icon success">✓</span>
+                                    <div class="activity-content">
+                                        <p>Building permit approved for Project Phoenix</p>
+                                        <span class="activity-time">2 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item" onclick="showNotification('Loading inspection details...', 'info')" style="cursor: pointer;">
+                                    <span class="activity-icon warning">!</span>
+                                    <div class="activity-content">
+                                        <p>Safety inspection scheduled for Site B</p>
+                                        <span class="activity-time">5 hours ago</span>
+                                    </div>
+                                </div>
+                                <div class="activity-item" onclick="showNotification('Opening regulations update...', 'info')" style="cursor: pointer;">
+                                    <span class="activity-icon info">i</span>
+                                    <div class="activity-content">
+                                        <p>New regulations update available</p>
+                                        <span class="activity-time">1 day ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Documents Page -->
+            <div id="documents-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Document Management</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="documents-container">
+                        <div class="upload-section">
+                            <h2>Upload Document</h2>
+                            <form id="doc-upload-form" onsubmit="uploadDocument(event)">
+                                <div class="upload-area" id="upload-area">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                                        <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+                                    </svg>
+                                    <p>Drag and drop files here or click to browse</p>
+                                    <input type="file" id="file-input" accept=".pdf,.doc,.docx,.txt" hidden onchange="handleFileSelect(event)">
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('file-input').click()">
+                                        Choose Files
+                                    </button>
+                                </div>
+                                <div class="form-group">
+                                    <label>Document Type</label>
+                                    <select id="doc-type">
+                                        <option value="permit">Building Permit</option>
+                                        <option value="blueprint">Blueprint</option>
+                                        <option value="contract">Contract</option>
+                                        <option value="regulation">Regulation</option>
+                                        <option value="specification">Specification</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Upload & Analyze</button>
+                            </form>
+                        </div>
+                        
+                        <div class="documents-list">
+                            <h2>Recent Documents</h2>
+                            <div class="document-item">
+                                <div class="doc-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                </div>
+                                <div class="doc-details">
+                                    <h4>Building_Permit_2024.pdf</h4>
+                                    <p>Uploaded 2 days ago • 2.4 MB</p>
+                                </div>
+                                <div class="doc-actions">
+                                    <button class="action-btn">View</button>
+                                    <button class="action-btn">Analyze</button>
+                                </div>
+                            </div>
+                            <div class="document-item">
+                                <div class="doc-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                    </svg>
+                                </div>
+                                <div class="doc-details">
+                                    <h4>Safety_Regulations_Update.docx</h4>
+                                    <p>Uploaded 1 week ago • 856 KB</p>
+                                </div>
+                                <div class="doc-actions">
+                                    <button class="action-btn">View</button>
+                                    <button class="action-btn">Analyze</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compliance Page -->
+            <div id="compliance-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Compliance Management</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="compliance-container">
+                        <div class="compliance-overview">
+                            <h2>Compliance Overview</h2>
+                            <div class="compliance-score-card">
+                                <div class="score-circle">
+                                    <svg width="120" height="120">
+                                        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--bg-active)" stroke-width="10"/>
+                                        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent-primary)" stroke-width="10"
+                                                stroke-dasharray="314" stroke-dashoffset="31.4" transform="rotate(-90 60 60)"/>
+                                    </svg>
+                                    <div class="score-text">94%</div>
+                                </div>
+                                <h3>Overall Compliance Score</h3>
+                                <p>Your project is in excellent compliance standing</p>
+                            </div>
+                        </div>
+                        
+                        <div class="compliance-categories">
+                            <h2>Compliance Categories</h2>
+                            <div class="category-list">
+                                <div class="category-item" onclick="viewComplianceDetails('building-codes')" style="cursor: pointer;">
+                                    <div class="category-header">
+                                        <h3>Building Codes</h3>
+                                        <span class="status-badge success">Compliant</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 98%"></div>
+                                    </div>
+                                    <p>Last reviewed: 3 days ago</p>
+                                </div>
+                                <div class="category-item" onclick="viewComplianceDetails('safety-regulations')" style="cursor: pointer;">
+                                    <div class="category-header">
+                                        <h3>Safety Regulations</h3>
+                                        <span class="status-badge warning">Review Required</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill warning" style="width: 85%"></div>
+                                    </div>
+                                    <p>3 items need attention</p>
+                                </div>
+                                <div class="category-item" onclick="viewComplianceDetails('environmental-standards')" style="cursor: pointer;">
+                                    <div class="category-header">
+                                        <h3>Environmental Standards</h3>
+                                        <span class="status-badge success">Compliant</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 95%"></div>
+                                    </div>
+                                    <p>Last reviewed: 1 week ago</p>
+                                </div>
+                                <div class="category-item" onclick="viewComplianceDetails('accessibility-requirements')" style="cursor: pointer;">
+                                    <div class="category-header">
+                                        <h3>Accessibility Requirements</h3>
+                                        <span class="status-badge success">Compliant</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 100%"></div>
+                                    </div>
+                                    <p>Fully compliant</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Analysis Page -->
+            <div id="risk-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Risk Analysis</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="risk-container">
+                        <div class="risk-summary">
+                            <h2>Risk Summary</h2>
+                            <div class="risk-cards">
+                                <div class="risk-card low" onclick="viewRiskDetails('financial-risk')" style="cursor: pointer;">
+                                    <h3>Financial Risk</h3>
+                                    <div class="risk-level">LOW</div>
+                                    <p>Budget variance: 2.3%</p>
+                                    <p>Contingency available: $450K</p>
+                                </div>
+                                <div class="risk-card medium" onclick="viewRiskDetails('schedule-risk')" style="cursor: pointer;">
+                                    <h3>Schedule Risk</h3>
+                                    <div class="risk-level">MEDIUM</div>
+                                    <p>Potential delay: 5 days</p>
+                                    <p>Critical path affected</p>
+                                </div>
+                                <div class="risk-card low" onclick="viewRiskDetails('safety-risk')" style="cursor: pointer;">
+                                    <h3>Safety Risk</h3>
+                                    <div class="risk-level">LOW</div>
+                                    <p>No incidents: 45 days</p>
+                                    <p>Safety score: 98%</p>
+                                </div>
+                                <div class="risk-card high" onclick="viewRiskDetails('weather-risk')" style="cursor: pointer;">
+                                    <h3>Weather Risk</h3>
+                                    <div class="risk-level">HIGH</div>
+                                    <p>Storm forecast next week</p>
+                                    <p>Impact: 3 work days</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="risk-details">
+                            <h2>Active Risk Mitigation</h2>
+                            <div class="mitigation-list">
+                                <div class="mitigation-item">
+                                    <div class="mitigation-header">
+                                        <h4>Weather Contingency Plan</h4>
+                                        <span class="priority-badge high">High Priority</span>
+                                    </div>
+                                    <p>Secure all materials and equipment before storm arrival. Reschedule concrete pours.</p>
+                                    <div class="mitigation-actions">
+                                        <button class="action-btn" onclick="viewRiskDetails('weather-contingency')">View Details</button>
+                                        <button class="action-btn" onclick="implementMitigation('weather-contingency')">Update Status</button>
+                                    </div>
+                                </div>
+                                <div class="mitigation-item">
+                                    <div class="mitigation-header">
+                                        <h4>Supply Chain Backup</h4>
+                                        <span class="priority-badge medium">Medium Priority</span>
+                                    </div>
+                                    <p>Alternative suppliers identified for critical materials. Lead time buffer added.</p>
+                                    <div class="mitigation-actions">
+                                        <button class="action-btn" onclick="viewRiskDetails('weather-contingency')">View Details</button>
+                                        <button class="action-btn" onclick="implementMitigation('weather-contingency')">Update Status</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Page -->
+            <div id="settings-page" class="page">
+                <header class="chat-header">
+                    <h1 class="chat-title">Settings</h1>
+                    <div class="header-actions">
+                        <button class="header-btn" onclick="toggleTheme()" title="Toggle Theme">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-light">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" class="theme-icon-dark" style="display: none;">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </header>
+                <div class="page-content">
+                    <div class="settings-container">
+                        <div class="settings-section">
+                            <h2>Profile Settings</h2>
+                            <form class="settings-form" onsubmit="saveSettings(event)">
+                                <div class="form-group">
+                                    <label>Full Name</label>
+                                    <input type="text" value="Demo User">
+                                </div>
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input type="email" value="demo@echo.ai" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Company</label>
+                                    <input type="text" value="Echo Construction">
+                                </div>
+                                <div class="form-group">
+                                    <label>Role</label>
+                                    <select>
+                                        <option>Project Manager</option>
+                                        <option>Site Supervisor</option>
+                                        <option>Safety Officer</option>
+                                        <option>Administrator</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h2>Notification Preferences</h2>
+                            <div class="settings-options">
+                                <label class="toggle-option">
+                                    <input type="checkbox" checked>
+                                    <span>Email notifications for risk alerts</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input type="checkbox" checked>
+                                    <span>Daily compliance summary</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input type="checkbox">
+                                    <span>Weekly project reports</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input type="checkbox" checked>
+                                    <span>Document upload confirmations</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h2>AI Assistant Settings</h2>
+                            <div class="settings-options">
+                                <div class="form-group">
+                                    <label>Response Detail Level</label>
+                                    <select>
+                                        <option>Concise</option>
+                                        <option selected>Balanced</option>
+                                        <option>Detailed</option>
+                                    </select>
+                                </div>
+                                <label class="toggle-option">
+                                    <input type="checkbox" checked>
+                                    <span>Include code examples in responses</span>
+                                </label>
+                                <label class="toggle-option">
+                                    <input type="checkbox" checked>
+                                    <span>Show source citations</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -203,6 +650,6 @@
         </main>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="js/modern-app.js"></script>
 </body>
 </html>
