@@ -379,9 +379,90 @@ window.setGraphView = setGraphView;
 window.toggleGraphView = toggleGraphView;
 window.closeNodeDetails = closeNodeDetails;
 
+// Update graph with conversation summary
+function updateGraphWithSummary(summary) {
+    // Check for pending summary
+    const pendingSummaryStr = localStorage.getItem('pendingSummary');
+    if (!pendingSummaryStr) return;
+    
+    try {
+        const summaryData = JSON.parse(pendingSummaryStr);
+        localStorage.removeItem('pendingSummary');
+        
+        // Add new nodes for summary topics
+        summaryData.topics.forEach((topic, index) => {
+            const nodeId = `summary-${summaryData.id}-${index}`;
+            const newNode = {
+                id: nodeId,
+                label: topic,
+                confidence: summaryData.averageConfidence,
+                type: summaryData.averageConfidence >= 80 ? 'high' : 
+                      summaryData.averageConfidence >= 50 ? 'medium' : 'low',
+                x: 350 + (Math.random() - 0.5) * 200,
+                y: 300 + (Math.random() - 0.5) * 200
+            };
+            
+            // Check if node already exists
+            const existingNode = graphData.nodes.find(n => n.label === topic);
+            if (!existingNode) {
+                graphData.nodes.push(newNode);
+                
+                // Connect to related nodes
+                graphData.nodes.forEach(node => {
+                    if (node.id !== nodeId && node.label.toLowerCase().includes(topic.toLowerCase().split(' ')[0])) {
+                        graphData.edges.push({
+                            source: nodeId,
+                            target: node.id,
+                            strength: 0.5
+                        });
+                    }
+                });
+            }
+        });
+        
+        // Re-render graph and update trust score
+        renderGraph();
+        updateTrustScore();
+        
+        // Show notification with summary details
+        const notificationHtml = `
+            <div style="margin-bottom: 0.5rem;">
+                <strong>Summary Added to Knowledge Graph</strong>
+            </div>
+            <div style="font-size: 0.875rem; opacity: 0.9;">
+                Topics: ${summaryData.topics.join(', ')}<br>
+                Average Confidence: ${Math.round(summaryData.averageConfidence)}%
+            </div>
+        `;
+        showNotification(notificationHtml, 'success');
+        
+        // Highlight new nodes
+        setTimeout(() => {
+            summaryData.topics.forEach((topic, index) => {
+                const nodeId = `summary-${summaryData.id}-${index}`;
+                const nodeElement = document.querySelector(`[data-node-id="${nodeId}"]`);
+                if (nodeElement) {
+                    nodeElement.style.animation = 'pulse 2s ease-in-out';
+                }
+            });
+        }, 100);
+        
+    } catch (error) {
+        console.error('Error updating graph with summary:', error);
+    }
+}
+
+// Export for global use
+window.updateGraphWithSummary = updateGraphWithSummary;
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('knowledge-graph-canvas')) {
         initializeKnowledgeGraph();
+        
+        // Check for pending summary on load
+        if (localStorage.getItem('pendingSummary')) {
+            updateGraphWithSummary();
+        }
     }
 });

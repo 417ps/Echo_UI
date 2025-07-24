@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "Echo/Altus"
+name = "Echo"
 dynamic = ["version"]
 description = "Client project with comprehensive AI and database tooling"
 readme = "README.md"
